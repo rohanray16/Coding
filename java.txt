@@ -1,30 +1,25 @@
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
-import javax.crypto.spec.IvParameterSpec;
+import org.apache.commons.codec.binary.Base64;
 
-public class Decryptor {
-    public static String decrypt(String encrypted, String key) throws Exception {
-        byte[] keyBytes = key.getBytes();
+public class AESDecryptor {
+    public static String decryptText(String encryptedText, String key) throws Exception {
+        byte[] keyBytes = key.getBytes("UTF-8");
         SecretKeySpec secretKey = new SecretKeySpec(keyBytes, "AES");
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
 
-        // Assuming that the IV is not passed along with the encrypted data, it needs to be set manually or handled appropriately
-        byte[] iv = new byte[cipher.getBlockSize()];
-        IvParameterSpec ivParams = new IvParameterSpec(iv);
-
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParams);
-        byte[] decodedValue = Base64.getDecoder().decode(encrypted);
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        byte[] decodedValue = Base64.decodeBase64(encryptedText);
         byte[] decryptedVal = cipher.doFinal(decodedValue);
         return new String(decryptedVal);
     }
 
     public static void main(String[] args) {
         try {
-            String secretKey = "your-secret-key"; // Must be exactly 16 chars (or adjust cipher spec)
-            String encryptedPassword = "encrypted-string-from-typescript";
-            String decryptedPassword = decrypt(encryptedPassword, secretKey);
-            System.out.println("Decrypted Password: " + decryptedPassword);
+            String key = "16-char-secretkey";  // Ensure this is 16 characters for AES-128
+            String encryptedText = "ENCRYPTED_STRING_HERE";  // Replace this with your encrypted text
+            String decryptedText = decryptText(encryptedText, key);
+            System.out.println("Decrypted Text: " + decryptedText);
         } catch (Exception e) {
             e.printStackTrace();
         }
