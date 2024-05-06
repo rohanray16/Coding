@@ -1,46 +1,32 @@
 import javax.crypto.Cipher;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 import javax.crypto.spec.IvParameterSpec;
-import org.apache.commons.codec.binary.Base64;
 
-public class CryptoUtils {
+public class Decryptor {
+    public static String decrypt(String encrypted, String key) throws Exception {
+        byte[] keyBytes = key.getBytes();
+        SecretKeySpec secretKey = new SecretKeySpec(keyBytes, "AES");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
 
-    private static final String passphrase = "your_super_secret_key_here"; // Same as in .env for the frontend
+        // Assuming that the IV is not passed along with the encrypted data, it needs to be set manually or handled appropriately
+        byte[] iv = new byte[cipher.getBlockSize()];
+        IvParameterSpec ivParams = new IvParameterSpec(iv);
 
-    public static String decrypt(String encrypted) {
-        try {
-            // Split the encrypted string into salt, iv, and ciphertext
-            String salt = encrypted.substring(0, 32);
-            String iv = encrypted.substring(32, 64);
-            String cipherText = encrypted.substring(64);
-
-            // Decode the base64 encoded strings
-            byte[] saltBytes = Base64.decodeBase64(salt);
-            byte[] ivBytes = Base64.decodeBase64(iv);
-            byte[] cipherBytes = Base64.decodeBase64(cipherText);
-
-            // Derive the key using PBKDF2
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-            PBEKeySpec spec = new PBEKeySpec(passphrase.toCharArray(), saltBytes, 1000, 256);
-            SecretKeySpec secretKey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-
-            // Decrypt the message
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(ivBytes));
-            byte[] decryptedBytes = cipher.doFinal(cipherBytes);
-
-            return new String(decryptedBytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParams);
+        byte[] decodedValue = Base64.getDecoder().decode(encrypted);
+        byte[] decryptedVal = cipher.doFinal(decodedValue);
+        return new String(decryptedVal);
     }
 
     public static void main(String[] args) {
-        // Example encrypted string from frontend
-        String encrypted = "base64_encoded_salt_iv_ciphertext_from_frontend";
-        System.out.println("Decrypted: " + decrypt(encrypted));
+        try {
+            String secretKey = "your-secret-key"; // Must be exactly 16 chars (or adjust cipher spec)
+            String encryptedPassword = "encrypted-string-from-typescript";
+            String decryptedPassword = decrypt(encryptedPassword, secretKey);
+            System.out.println("Decrypted Password: " + decryptedPassword);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
