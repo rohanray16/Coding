@@ -1,0 +1,15 @@
+Learn it on your own before next session:-
+
+1.	Types of elements(Inline and Block elements)
+2.	Paragraph tag, Span tag, Anchor tag, div tag, line break tag, &nbsp; spacing,
+Header tag(h1..h6),Button tag,
+3.	List tag(ul tag, ol tag, li tag), Table Tag(tr tag, td tag, tbody tag, thead tag)
+4.	Input tag(different types:- text,date,password, checkbox, radio….), select tag(option tag), textarea tag
+5.	Form tag(will discuss this in session)
+6.	CSS basics(Inline styling, external styling
+
+Prabhu any confusion I will clear it whenever u message me or in the session, but please go through these topics otherwise going forward it will be difficult. If u clear this topic, we can finish making the google page by next session.
+
+
+
+ 
