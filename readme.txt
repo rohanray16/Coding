@@ -1,15 +1,13 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 
-interface TextAreaProps {
-  lineLength: number;
-  numLines: number;
-}
+const MAX_LINE_LENGTH = 35;
 
-const TextArea: React.FC<TextAreaProps> = ({ lineLength, numLines }) => {
+const TextArea: React.FC = () => {
   const [text, setText] = useState<string>('');
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
+    const inputText = e.target.value;
+    setText(wrapText(inputText));
   };
 
   const wrapText = (input: string): string => {
@@ -18,7 +16,7 @@ const TextArea: React.FC<TextAreaProps> = ({ lineLength, numLines }) => {
     let currentLine = '';
 
     words.forEach(word => {
-      if (currentLine.length + word.length + 1 > lineLength) {
+      if (currentLine.length + word.length + 1 > MAX_LINE_LENGTH) {
         wrappedText += currentLine.trim() + '\n';
         currentLine = word + ' ';
       } else {
@@ -28,24 +26,19 @@ const TextArea: React.FC<TextAreaProps> = ({ lineLength, numLines }) => {
 
     wrappedText += currentLine.trim();
 
-    const lines = wrappedText.split('\n');
-    if (lines.length > numLines) {
-      return lines.slice(0, numLines).join('\n');
-    }
-
     return wrappedText;
   };
 
   useEffect(() => {
-    setText(prevText => wrapText(prevText));
-  }, [lineLength, numLines]);
+    setText(wrapText(text));
+  }, [text]);
 
   return (
     <textarea
       value={text}
       onChange={handleTextChange}
-      rows={numLines}
-      style={{ width: `${lineLength * 8}px` }} // Adjust width based on line length
+      rows={10}
+      style={{ width: '100%', height: '200px' }}
     />
   );
 };
