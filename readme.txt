@@ -1,41 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 
-const TextareaWithWrap: React.FC = () => {
-  const [text, setText] = useState('');
+interface TextAreaProps {
+  lineLength: number;
+  numLines: number;
+}
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const inputText = e.target.value;
-    const wrappedText = wrapText(inputText, 15);
-    setText(wrappedText);
+const TextArea: React.FC<TextAreaProps> = ({ lineLength, numLines }) => {
+  const [text, setText] = useState<string>('');
+
+  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
   };
 
-  const wrapText = (text: string, lineLength: number): string => {
-    const words = text.split(' ');
+  const wrapText = (input: string): string => {
+    const words = input.split(' ');
     let wrappedText = '';
-    let currentLineLength = 0;
+    let currentLine = '';
 
     words.forEach(word => {
-      if (currentLineLength + word.length + 1 > lineLength) {
-        wrappedText += '\n' + word + ' ';
-        currentLineLength = word.length + 1;
+      if (currentLine.length + word.length + 1 > lineLength) {
+        wrappedText += currentLine.trim() + '\n';
+        currentLine = word + ' ';
       } else {
-        wrappedText += word + ' ';
-        currentLineLength += word.length + 1;
+        currentLine += word + ' ';
       }
     });
 
-    return wrappedText.trim();
+    wrappedText += currentLine.trim();
+
+    const lines = wrappedText.split('\n');
+    if (lines.length > numLines) {
+      return lines.slice(0, numLines).join('\n');
+    }
+
+    return wrappedText;
   };
+
+  useEffect(() => {
+    setText(prevText => wrapText(prevText));
+  }, [lineLength, numLines]);
 
   return (
     <textarea
       value={text}
-      onChange={handleChange}
-      rows={10}
-      cols={30}
-      style={{ whiteSpace: 'pre-wrap' }}
+      onChange={handleTextChange}
+      rows={numLines}
+      style={{ width: `${lineLength * 8}px` }} // Adjust width based on line length
     />
   );
 };
 
-export default TextareaWithWrap;
+export default TextArea;
