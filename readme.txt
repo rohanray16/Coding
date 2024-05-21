@@ -4,10 +4,11 @@ const MAX_LINE_LENGTH = 35;
 
 const TextArea: React.FC = () => {
   const [text, setText] = useState<string>('');
+  const [formattedText, setFormattedText] = useState<string>('');
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const inputText = e.target.value;
-    setText(wrapText(inputText));
+    setText(inputText);
   };
 
   const wrapText = (input: string): string => {
@@ -30,15 +31,15 @@ const TextArea: React.FC = () => {
   };
 
   useEffect(() => {
-    setText(wrapText(text));
+    setFormattedText(wrapText(text));
   }, [text]);
 
   return (
     <textarea
-      value={text}
+      value={formattedText}
       onChange={handleTextChange}
       rows={10}
-      style={{ width: '100%', height: '200px' }}
+      style={{ width: '100%', height: '200px', whiteSpace: 'pre-wrap' }}
     />
   );
 };
